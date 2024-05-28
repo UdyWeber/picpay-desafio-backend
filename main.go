@@ -15,7 +15,7 @@ func main() {
 	user, err := testQueries.CreateNewShopKeeperUser(context.Background(), db.CreateNewShopKeeperUserParams{
 		FullName: "Jaw",
 		Cpf:      "000.000.000-00",
-		Email:    "tuyweber@gmail.com",
+		Email:    "email@gmail.com",
 		Cnpj:     "61.687.803/0001-50",
 	})
 	if err != nil {
