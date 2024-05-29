@@ -19,4 +19,5 @@ func mountRoutes(router *http.ServeMux) {
 	})
 	router.HandleFunc("POST /transaction", routes.HandleNewTransaction)
 	router.HandleFunc("GET /transaction", routes.HandleGetTransactions)
+	router.HandleFunc("POST /user", routes.HandleCreateNewUser)
 }
