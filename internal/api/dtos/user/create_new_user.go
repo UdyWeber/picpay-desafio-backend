@@ -37,7 +37,7 @@ func (u *CreateNewUser) Validate() *errors.UnprocessableEntityError {
 	}
 
 	trimmedCNPJ := strings.NewReplacer(".", "", "-", "", "/", "").Replace(u.CNPJ)
-	if trimmedCNPJ == "" {
+	if !(trimmedCNPJ == "") {
 		if len(trimmedCNPJ) != 14 {
 			fields["cnpj"] = fmt.Sprintf("CNPJ=%s is not a valid cpnj, must have 14 characters", u.CNPJ)
 		}

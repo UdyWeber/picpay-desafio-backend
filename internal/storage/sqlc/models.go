@@ -16,10 +16,6 @@ type CommonUser struct {
 	Cpf       string             `json:"cpf"`
 	Email     string             `json:"email"`
 	CreatedAt time.Time          `json:"created_at"`
+	Cnpj      pgtype.Text        `json:"cnpj"`
 	DeletedAt pgtype.Timestamptz `json:"deleted_at"`
-}
-
-type Shoopkeeper struct {
-	CommonUserID int64  `json:"common_user_id"`
-	Cnpj         string `json:"cnpj"`
 }

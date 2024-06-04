@@ -14,7 +14,3 @@ func NewUnprocessableEntityError(errorMessage string, message string, fields map
 		Fields: fields,
 	}
 }
-
-func (e *UnprocessableEntityError) ToResponse() []byte {
-	return marshalApiError(e, "UnprocessableEntityError")
-}

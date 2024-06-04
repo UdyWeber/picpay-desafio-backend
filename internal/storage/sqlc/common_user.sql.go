@@ -7,22 +7,30 @@ package db
 
 import (
 	"context"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createCommonUser = `-- name: CreateCommonUser :one
-INSERT INTO common_user (full_name, cpf, email)
-values ($1, $2, $3)
-returning id, full_name, cpf, email, created_at, deleted_at
+INSERT INTO common_user (full_name, cpf, email, cnpj)
+values ($1, $2, $3, $4)
+returning id, full_name, cpf, email, created_at, cnpj, deleted_at
 `
 
 type CreateCommonUserParams struct {
-	FullName string `json:"full_name"`
-	Cpf      string `json:"cpf"`
-	Email    string `json:"email"`
+	FullName string      `json:"full_name"`
+	Cpf      string      `json:"cpf"`
+	Email    string      `json:"email"`
+	Cnpj     pgtype.Text `json:"cnpj"`
 }
 
 func (q *Queries) CreateCommonUser(ctx context.Context, arg CreateCommonUserParams) (CommonUser, error) {
-	row := q.db.QueryRow(ctx, createCommonUser, arg.FullName, arg.Cpf, arg.Email)
+	row := q.db.QueryRow(ctx, createCommonUser,
+		arg.FullName,
+		arg.Cpf,
+		arg.Email,
+		arg.Cnpj,
+	)
 	var i CommonUser
 	err := row.Scan(
 		&i.ID,
@@ -30,13 +38,14 @@ func (q *Queries) CreateCommonUser(ctx context.Context, arg CreateCommonUserPara
 		&i.Cpf,
 		&i.Email,
 		&i.CreatedAt,
+		&i.Cnpj,
 		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const getCommonUser = `-- name: GetCommonUser :one
-SELECT id, full_name, cpf, email, created_at, deleted_at
+SELECT id, full_name, cpf, email, created_at, cnpj, deleted_at
 FROM common_user
 WHERE id = $1
 LIMIT 1
@@ -51,13 +60,14 @@ func (q *Queries) GetCommonUser(ctx context.Context, id int64) (CommonUser, erro
 		&i.Cpf,
 		&i.Email,
 		&i.CreatedAt,
+		&i.Cnpj,
 		&i.DeletedAt,
 	)
 	return i, err
 }
 
 const getCommonUserByEmail = `-- name: GetCommonUserByEmail :one
-SELECT id, full_name, cpf, email, created_at, deleted_at
+SELECT id, full_name, cpf, email, created_at, cnpj, deleted_at
 FROM common_user
 WHERE email = $1
 LIMIT 1
@@ -72,6 +82,7 @@ func (q *Queries) GetCommonUserByEmail(ctx context.Context, email string) (Commo
 		&i.Cpf,
 		&i.Email,
 		&i.CreatedAt,
+		&i.Cnpj,
 		&i.DeletedAt,
 	)
 	return i, err

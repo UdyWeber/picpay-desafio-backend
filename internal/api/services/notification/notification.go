@@ -1,4 +1,4 @@
-package services
+package notification
 
 import (
 	"bytes"
@@ -9,11 +9,21 @@ import (
 	"net/http"
 )
 
-func NotifyUser() error {
+type MockNotifier struct {
+	serviceUrl string
+}
+
+func NewMockNotifier() *MockNotifier {
+	return &MockNotifier{
+		serviceUrl: "https://util.devi.tools/api/v1/notify",
+	}
+}
+
+func (mn *MockNotifier) Notify() error {
 	var notifyResponse notifications.NotifyResponse
 
 	resp, err := http.Post(
-		"https://util.devi.tools/api/v1/notify",
+		mn.serviceUrl,
 		"application/json",
 		&bytes.Buffer{},
 	)

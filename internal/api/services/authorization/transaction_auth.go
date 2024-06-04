@@ -1,4 +1,4 @@
-package services
+package authorization
 
 import (
 	"desafio-pic-pay/internal/api/dtos/transaction"
@@ -9,10 +9,20 @@ import (
 	"net/http"
 )
 
-func getTransactionAuthorization() (*transaction.Authorization, error) {
+type TransactionAuthorizer struct {
+	serviceUrl string
+}
+
+func NewTransactionAuthorizer() *TransactionAuthorizer {
+	return &TransactionAuthorizer{
+		"https://util.devi.tools/api/v2/authorize",
+	}
+}
+
+func (ta *TransactionAuthorizer) getTransactionAuthorization() (*transaction.Authorization, error) {
 	var authorization transaction.Authorization
 
-	resp, err := http.Get("https://util.devi.tools/api/v2/authorize")
+	resp, err := http.Get(ta.serviceUrl)
 	if err != nil {
 		return &authorization, errors.New("Couldn't performe request because of: " + err.Error())
 	}
@@ -31,8 +41,8 @@ func getTransactionAuthorization() (*transaction.Authorization, error) {
 	return &authorization, nil
 }
 
-func AuthorizeTransaction() error {
-	transactionAuthorization, err := getTransactionAuthorization()
+func (ta *TransactionAuthorizer) Authorize() error {
+	transactionAuthorization, err := ta.getTransactionAuthorization()
 	if err != nil {
 		return err
 	}

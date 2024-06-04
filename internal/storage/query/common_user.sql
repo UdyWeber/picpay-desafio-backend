@@ -11,6 +11,6 @@ WHERE email = $1
 LIMIT 1;
 
 -- name: CreateCommonUser :one
-INSERT INTO common_user (full_name, cpf, email)
-values ($1, $2, $3)
+INSERT INTO common_user (full_name, cpf, email, cnpj)
+values ($1, $2, $3, $4)
 returning *;

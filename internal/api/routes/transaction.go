@@ -6,7 +6,7 @@ import (
 )
 
 func HandleNewTransaction(w http.ResponseWriter, r *http.Request) {
-	log.Println("Adding new transaction...")
+	log.Println("Adding new authorization...")
 }
 
 func HandleGetTransactions(w http.ResponseWriter, r *http.Request) {

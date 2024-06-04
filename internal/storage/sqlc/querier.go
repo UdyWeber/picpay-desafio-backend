@@ -10,10 +10,8 @@ import (
 
 type Querier interface {
 	CreateCommonUser(ctx context.Context, arg CreateCommonUserParams) (CommonUser, error)
-	CreateNewShopKeeperUser(ctx context.Context, arg CreateNewShopKeeperUserParams) (CreateNewShopKeeperUserRow, error)
 	GetCommonUser(ctx context.Context, id int64) (CommonUser, error)
 	GetCommonUserByEmail(ctx context.Context, email string) (CommonUser, error)
-	GetShopKeeperUser(ctx context.Context, commonUserID int64) (GetShopKeeperUserRow, error)
 }
 
 var _ Querier = (*Queries)(nil)

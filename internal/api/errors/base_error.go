@@ -6,7 +6,6 @@ import (
 
 type IBaseError interface {
 	Error() string
-	ToResponse() []byte
 }
 
 type BaseError struct {
@@ -20,10 +19,6 @@ func (e *BaseError) Error() string {
 	}
 
 	return fmt.Sprintf("[ERROR] %s", e.Message)
-}
-
-func (e *BaseError) ToResponse() []byte {
-	return marshalApiError(e, "BaseError")
 }
 
 func NewBaseError(originalMessage, message string) *BaseError {
