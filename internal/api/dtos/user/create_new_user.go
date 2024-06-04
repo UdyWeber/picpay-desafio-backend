@@ -2,7 +2,9 @@ package user
 
 import (
 	"desafio-pic-pay/internal/api/errors"
+	db "desafio-pic-pay/internal/storage/sqlc"
 	"fmt"
+	"github.com/jackc/pgx/v5/pgtype"
 	"strings"
 )
 
@@ -14,7 +16,19 @@ type CreateNewUser struct {
 	CNPJ     string `json:"cnpj"`
 }
 
-func (u *CreateNewUser) Validate() *errors.UnprocessableEntityError {
+func (u *CreateNewUser) ToDbArgs() *db.CreateCommonUserParams {
+	return &db.CreateCommonUserParams{
+		FullName: u.FullName,
+		Cpf:      u.CPF,
+		Email:    u.Email,
+		Cnpj: pgtype.Text{
+			String: u.CNPJ,
+			Valid:  true,
+		},
+	}
+}
+
+func (u *CreateNewUser) Validate() errors.IBaseError {
 	fields := make(map[string]string)
 
 	trimmedName := strings.TrimSpace(u.FullName)
@@ -51,5 +65,7 @@ func (u *CreateNewUser) Validate() *errors.UnprocessableEntityError {
 		)
 	}
 
+	u.CPF = trimmedCPF
+	u.CNPJ = trimmedCNPJ
 	return nil
 }

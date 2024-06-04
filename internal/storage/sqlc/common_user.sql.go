@@ -87,3 +87,20 @@ func (q *Queries) GetCommonUserByEmail(ctx context.Context, email string) (Commo
 	)
 	return i, err
 }
+
+const userExists = `-- name: UserExists :one
+select count(*) from common_user
+where cpf = $1 or email = $2
+`
+
+type UserExistsParams struct {
+	Cpf   string `json:"cpf"`
+	Email string `json:"email"`
+}
+
+func (q *Queries) UserExists(ctx context.Context, arg UserExistsParams) (int64, error) {
+	row := q.db.QueryRow(ctx, userExists, arg.Cpf, arg.Email)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
+}

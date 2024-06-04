@@ -12,6 +12,7 @@ type Querier interface {
 	CreateCommonUser(ctx context.Context, arg CreateCommonUserParams) (CommonUser, error)
 	GetCommonUser(ctx context.Context, id int64) (CommonUser, error)
 	GetCommonUserByEmail(ctx context.Context, email string) (CommonUser, error)
+	UserExists(ctx context.Context, arg UserExistsParams) (int64, error)
 }
 
 var _ Querier = (*Queries)(nil)

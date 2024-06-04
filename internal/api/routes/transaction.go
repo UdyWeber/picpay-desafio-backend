@@ -5,6 +5,10 @@ import (
 	"net/http"
 )
 
+func HandleDoTransaction(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func HandleNewTransaction(w http.ResponseWriter, r *http.Request) {
 	log.Println("Adding new authorization...")
 }

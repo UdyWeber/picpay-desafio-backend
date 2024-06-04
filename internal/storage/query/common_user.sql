@@ -14,3 +14,7 @@ LIMIT 1;
 INSERT INTO common_user (full_name, cpf, email, cnpj)
 values ($1, $2, $3, $4)
 returning *;
+
+-- name: UserExists :one
+select count(*) from common_user
+where cpf = $1 or email = $2;

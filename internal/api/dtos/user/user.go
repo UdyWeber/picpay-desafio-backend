@@ -9,11 +9,11 @@ type User struct {
 	Email    string `json:"email"`
 }
 
-func (u *User) SendTransaction(to IUser) error {
+func (u *User) SendTransaction(to ApiUser) error {
 	return nil
 }
 
-func NewUser(u *db.CommonUser) IUser {
+func NewUser(u *db.CommonUser) ApiUser {
 	if u.Cnpj.Valid {
 		return NewShopUser(u)
 	}
