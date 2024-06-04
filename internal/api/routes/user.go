@@ -10,61 +10,72 @@ import (
 	"net/http"
 )
 
-// TODO: Make this functions accept: http.ResponseWriter, context.Context, db.Querier, http.Request
-func HandleCreateNewUser(queries db.Querier) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var newUser user.CreateNewUser
-		var apiError errors.IBaseError
+func HandleCreateNewUser(w http.ResponseWriter, r *http.Request, queries *db.Queries, _ context.Context) *errors.APIErrorWrapper {
+	var newUser user.CreateNewUser
 
-		bodyBytes, err := io.ReadAll(r.Body)
-		if err != nil {
-			apiError = errors.NewBaseError(err.Error(), "Couldn't read response body properly")
-			WriteJSON(w, http.StatusUnprocessableEntity, apiError)
-			return
-		}
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusUnprocessableEntity,
+			errors.NewUnprocessableEntityError(err.Error(), "Couldn't read response body properly", nil),
+		)
+	}
 
-		err = json.Unmarshal(bodyBytes, &newUser)
-		if err != nil {
-			apiError = errors.NewUnprocessableEntityError(
+	if err = json.Unmarshal(bodyBytes, &newUser); err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusUnprocessableEntity,
+			errors.NewUnprocessableEntityError(
 				err.Error(),
 				"Couldn't parse JSON body",
 				nil,
-			)
-			WriteJSON(w, http.StatusUnprocessableEntity, apiError)
-			return
-		}
-
-		apiError = newUser.Validate()
-		if apiError != nil {
-			WriteJSON(w, http.StatusUnprocessableEntity, apiError)
-			return
-		}
-
-		exists, err := queries.UserExists(context.Background(), db.UserExistsParams{
-			Cpf:   newUser.CPF,
-			Email: newUser.Email,
-		})
-		if err != nil {
-			apiError = errors.NewBaseError(err.Error(), "Couldn't check user existence")
-			WriteJSON(w, http.StatusInternalServerError, apiError)
-			return
-		}
-
-		if exists > 0 {
-			apiError = errors.NewBaseError("", "User already exists")
-			WriteJSON(w, http.StatusConflict, apiError)
-			return
-		}
-
-		dbUser, err := queries.CreateCommonUser(context.Background(), *newUser.ToDbArgs())
-
-		if err != nil {
-			apiError = errors.NewBaseError(err.Error(), "Couldn't create new user")
-			WriteJSON(w, http.StatusInternalServerError, apiError)
-			return
-		}
-
-		responseUser := user.NewUser(&dbUser)
-		WriteJSON(w, http.StatusCreated, responseUser)
+			),
+		)
 	}
+
+	if err = newUser.Validate(); err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusUnprocessableEntity,
+			err,
+		)
+	}
+
+	exists, err := queries.UserExists(context.Background(), db.UserExistsParams{
+		Cpf:   newUser.CPF,
+		Email: newUser.Email,
+	})
+
+	if err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusInternalServerError,
+			errors.NewBaseError(err.Error(), "Couldn't check user existence"),
+		)
+	}
+
+	if exists > 0 {
+		return errors.NewErrorWrapper(
+			http.StatusConflict,
+			errors.NewBaseError("", "User already exists"),
+		)
+
+	}
+
+	dbUser, err := queries.CreateCommonUser(context.Background(), *newUser.ToDbArgs())
+
+	if err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusInternalServerError,
+			errors.NewBaseError(err.Error(), "Couldn't create new user"),
+		)
+	}
+
+	responseUser := user.NewUser(&dbUser)
+
+	if err = WriteJSON(w, http.StatusCreated, responseUser); err != nil {
+		return errors.NewErrorWrapper(
+			http.StatusInternalServerError,
+			errors.NewBaseError(err.Error(), "Couldn't write response"),
+		)
+	}
+
+	return nil
 }

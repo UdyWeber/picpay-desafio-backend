@@ -4,10 +4,6 @@ import (
 	"fmt"
 )
 
-type IBaseError interface {
-	Error() string
-}
-
 type BaseError struct {
 	OriginalMessage string `json:"original_message,omitempty"`
 	Message         string `json:"message"`

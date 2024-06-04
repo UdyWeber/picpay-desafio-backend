@@ -28,7 +28,7 @@ func (u *CreateNewUser) ToDbArgs() *db.CreateCommonUserParams {
 	}
 }
 
-func (u *CreateNewUser) Validate() errors.IBaseError {
+func (u *CreateNewUser) Validate() error {
 	fields := make(map[string]string)
 
 	trimmedName := strings.TrimSpace(u.FullName)
